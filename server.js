@@ -2,9 +2,6 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 
-const PORT = process.env.PORT || 3000;
-const PUBLIC_DIR = __dirname;
-
 const MIME_TYPES = {
   '.html': 'text/html; charset=UTF-8',
   '.css': 'text/css; charset=UTF-8',
@@ -19,20 +16,28 @@ const MIME_TYPES = {
   '.woff2': 'font/woff2'
 };
 
-const server = http.createServer((req, res) => {
-  // Normalize URL
+function handler(req, res) {
   let reqPath = req.url.split('?')[0];
-  if (reqPath === '/') {
+  if (reqPath === '/' || reqPath === '') {
     reqPath = '/index.html';
   }
 
   const safePath = path.normalize(reqPath).replace(/^(\.\.[\/\\])+/, '');
-  const filePath = path.join(PUBLIC_DIR, safePath);
+  const filePath = path.join(__dirname, safePath);
 
   fs.stat(filePath, (err, stats) => {
     if (err || !stats.isFile()) {
-      res.writeHead(404, { 'Content-Type': 'text/html; charset=UTF-8' });
-      res.end('<h1>404 - Trang không tìm thấy</h1>');
+      // Fallback to index.html if file doesn't exist
+      const indexPath = path.join(__dirname, 'index.html');
+      fs.readFile(indexPath, (readErr, content) => {
+        if (readErr) {
+          res.writeHead(404, { 'Content-Type': 'text/html; charset=UTF-8' });
+          res.end('<h1>404 - Trang không tìm thấy</h1>');
+          return;
+        }
+        res.writeHead(200, { 'Content-Type': 'text/html; charset=UTF-8' });
+        res.end(content);
+      });
       return;
     }
 
@@ -48,8 +53,16 @@ const server = http.createServer((req, res) => {
     const stream = fs.createReadStream(filePath);
     stream.pipe(res);
   });
-});
+}
 
-server.listen(PORT, () => {
-  console.log(`Server đang chạy tại: http://localhost:${PORT}`);
-});
+// Local standalone server execution
+if (require.main === module) {
+  const PORT = process.env.PORT || 3000;
+  const server = http.createServer(handler);
+  server.listen(PORT, () => {
+    console.log(`Server đang chạy tại: http://localhost:${PORT}`);
+  });
+}
+
+// Export handler for Vercel Serverless environment
+module.exports = handler;

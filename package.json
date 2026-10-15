@@ -1,8 +1,7 @@
 {
   "name": "auth-system",
   "version": "1.0.0",
-  "description": "Trang đăng nhập / đăng ký hiện đại hỗ trợ đăng nhập nhanh bằng Google",
-  "main": "server.js",
+  "description": "Trang đăng nhập / đăng ký người dùng hiện đại hỗ trợ đăng nhập nhanh bằng Google",
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js"
