@@ -1,0 +1,13 @@
+{
+  "name": "auth-system",
+  "version": "1.0.0",
+  "description": "Trang đăng nhập / đăng ký hiện đại hỗ trợ đăng nhập nhanh bằng Google",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": ["auth", "google-signin", "login", "register"],
+  "author": "",
+  "license": "ISC"
+}
